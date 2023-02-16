@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="/webjars/bootstrap/5.2.3/css/bootstrap.min.css">
+
+</head>
+<body>
+
+    <main class="container my-5">
+        <div class="row">
+            <div class="col">
+                <form id="login-form" method="post" action="http://localhost:8080/api/v1/auth/login">
+                    <div class="mb-3">
+                        <input type="text" name="email" id="email" class="form-control" placeholder="E-Mail">
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" name="password" id="password" class="form-control" placeholder="Passwort">
+                    </div>
+                    <button type="submit" class="btn btn-success">Login</button>
+                </form>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-info" id="btn-data">Data</button>
+                <button type="button" class="btn btn-danger" id="btn-logout">Logout</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="/webjars/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+    <script src="/webjars/jquery/3.6.3/jquery.min.js"></script>
+    <script>
+        $(document).ready(() => { // Warte bis das ganze HTML geladen wurde
+
+            $('#btn-data').click(() => { // Click-Event-Listener
+
+                $.ajax({
+                    type: 'get',
+                    url: 'http://localhost:8080/api/v1/pets',
+                    dataType: 'json', // Der Response ist JSON
+                    beforeSend: (req) => { // Request manipulieren... JWT Token dranhängen
+                        if(localStorage.getItem('token')) {
+                            // An Request Authorization-Header dranhängen
+                            req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
+                        }
+                    },
+                    success: (resp) => {
+                        console.log(resp);
+                    },
+                    error: () => {
+                        console.log('Error');
+                    }
+                });
+            });
+
+            $('#login-form').submit((event) => { // Submit-Event-Listener für das Formular
+                event.preventDefault(); // Unterbindet den Browser-Sprung zu Action
+
+                let form = $('#login-form');
+                let method = form.attr('method'); // Fragt das Method-Attribut im Form-Tag ab
+                let action = form.attr('action') // Fragt das Action-Attribut im Form-Tag ab
+
+                $.ajax({
+                    cache: false, // Es soll kein Browsercache verwendet werden
+                    type: method,
+                    url: action,
+                    contentType: 'application/json', // Mime-Type für das Versenden der Formulardaten
+                    data: JSON.stringify({"email": $('#email').val(), "password": $('#password').val()}), // Verpackt die Werte aus dem Formular in JSON
+                    success: (resp) => { // resp ist das Response für die Anfrage
+                        localStorage.setItem('token', resp.token); // liest den Token aus JSON raus und scheibt ihn in LocalStorage
+                        console.log('Angemeldet');
+                    },
+                    error: () => {
+                        console.log('Error');
+                    }
+                });
+            });
+
+            $('#btn-logout').click(() => {
+                localStorage.clear();
+            });
+        });
+    </script>
+</body>
+</html>
