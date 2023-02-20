@@ -15,6 +15,10 @@
     <main class="container my-5">
         <div class="row">
             <div class="col">
+                <div class="alert alert-danger d-none" role="alert" id="login-alert">
+                    Falsche Zugangsdaten
+                </div>
+
                 <form id="login-form" method="post" action="http://localhost:8080/api/v1/auth/login">
                     <div class="mb-3">
                         <input type="text" name="email" id="email" class="form-control" placeholder="E-Mail">
@@ -26,7 +30,7 @@
                 </form>
             </div>
             <div class="col">
-                <button type="button" class="btn btn-info" id="btn-data">Data</button>
+                <button type="button" class="btn btn-info" id="btn-data">Daten abrufen</button>
                 <button type="button" class="btn btn-danger" id="btn-logout">Logout</button>
             </div>
         </div>
@@ -49,81 +53,46 @@
                 </table>
             </div>
         </div>
+
+        <div class="row my-5">
+            <div class="col-6">
+                <h2>Neues Tier anmelden</h2>
+                <form id="pet-form" method="post" action="http://localhost:8080/api/v1/pets">
+                    <div class="mb-3">
+                        <label for="chipId">ChipID</label>
+                        <input type="text" name="chipId" id="chipId" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="name">Name</label>
+                        <input type="text" name="name" id="name" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="type">Typ</label>
+                        <select name="type" id="type" class="form-select">
+                            <option value="CAT">Katze</option>
+                            <option value="DOG">Hund</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="race">Rasse</label>
+                        <input type="text" name="race" id="race" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="birthDate">Geburtsdatum</label>
+                        <input type="text" name="birthDate" id="birthDate" class="form-control" placeholder="JJJJ-MM-TT">
+                    </div>
+                    <button type="submit" class="btn btn-success">Speichern</button>
+                </form>
+            </div>
+        </div>
+
     </main>
 
-    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="liveToast">
-        <div class="toast-header">
-            <img src="..." class="rounded me-2" alt="...">
-            <strong class="me-auto">Spring Daten</strong>
-            <small class="text-muted">just now</small>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-            Du bist nicht angemeldet!
-        </div>
-    </div>
-
     <script src="/webjars/bootstrap/5.2.3/js/bootstrap.bundle.min.js"></script>
+    <!--
     <script src="/webjars/jquery/3.6.3/jquery.min.js"></script>
-    <script>
-        const toastLiveExample = document.getElementById('liveToast')
-
-        $(document).ready(() => { // Warte bis das ganze HTML geladen wurde
-
-            $('#btn-data').click(() => { // Click-Event-Listener
-
-                $.ajax({
-                    type: 'get',
-                    url: 'http://localhost:8080/api/v1/pets',
-                    dataType: 'json', // Der Response ist JSON
-                    beforeSend: (req) => { // Request manipulieren... JWT Token dranhängen
-                        if(localStorage.getItem('token')) {
-                            // An Request Authorization-Header dranhängen
-                            req.setRequestHeader('Authorization', 'Bearer ' + localStorage.getItem('token'));
-                        }
-                    },
-                    success: (resp) => {
-                        let tbl = $("#pet-tbl");
-                        let output = '';
-                        $.each(resp, (i, pet) => {
-                            output += '<tr><td>' + pet.chipId + '</td><td>' + pet.name + '</td><td>' + pet.type + '</td><td>' + pet.race + '</td><td>' + pet.birthDate + '</td><td>' + pet.owner.firstname + " " + pet.owner.lastname + '</td></tr>';
-                        });
-                        tbl.html(output);
-                    },
-                    error: () => {
-                        const toast = new bootstrap.Toast(toastLiveExample)
-                        toast.show()
-                    }
-                });
-            });
-
-            $('#login-form').submit((event) => { // Submit-Event-Listener für das Formular
-                event.preventDefault(); // Unterbindet den Browser-Sprung zu Action
-
-                let form = $('#login-form');
-                let method = form.attr('method'); // Fragt das Method-Attribut im Form-Tag ab
-                let action = form.attr('action') // Fragt das Action-Attribut im Form-Tag ab
-
-                $.ajax({
-                    cache: false, // Es soll kein Browsercache verwendet werden
-                    type: method,
-                    url: action,
-                    contentType: 'application/json', // Mime-Type für das Versenden der Formulardaten
-                    data: JSON.stringify({"email": $('#email').val(), "password": $('#password').val()}), // Verpackt die Werte aus dem Formular in JSON
-                    success: (resp) => { // resp ist das Response für die Anfrage
-                        localStorage.setItem('token', resp.token); // liest den Token aus JSON raus und scheibt ihn in LocalStorage
-                    },
-                    error: () => {
-                        const toast = new bootstrap.Toast(toastLiveExample)
-                        toast.show()
-                    }
-                });
-            });
-
-            $('#btn-logout').click(() => {
-                localStorage.clear();
-            });
-        });
-    </script>
+    <script src="/js/basic-jq.js"></script>
+    -->
+    <script src="/js/basic.js"></script>
 </body>
 </html>
